@@ -14,3 +14,16 @@ jobs:
       - uses: overhangio/test-docker-build@main
       - name: Build openedx Docker image from scratch
         run: time tutor images build openedx
+
+  build-openedx-with-registry-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: overhangio/test-docker-build@main
+      - name: Install tutor from fork
+        run: pip uninstall --yes tutor && pip install git+https://github.com/overhangio/tutor.git@regisb/docker-optimize#egg=tutor
+      - name: Install registry cache plugin 
+        run: tutor plugins install https://gist.githubusercontent.com/regisb/4049622ec4b48cbd48c89ec708dc5252/raw/docker-registry-cache.py
+      - name: Enable registry cache plugin
+        run: tutor plugins enable docker-registry-cache && tutor config save
+      - name: Build openedx Docker image with cache
+        run: time tutor images build openedx
