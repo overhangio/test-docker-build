@@ -1,0 +1,16 @@
+name: Build Docker images
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-openedx-from-scratch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: overhangio/test-docker-build@main
+      - name: Build openedx Docker image from scratch
+        run: time tutor images build openedx
