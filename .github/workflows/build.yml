@@ -28,6 +28,17 @@ jobs:
       - name: Build openedx Docker image with cache
         run: time tutor images build openedx
 
+  build-openedx-with-registry-cache-from-fork:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: overhangio/test-docker-build@main
+      - name: Install registry cache plugin
+        run: tutor plugins install https://gist.githubusercontent.com/regisb/4049622ec4b48cbd48c89ec708dc5252/raw/docker-registry-cache.py
+      - name: Enable registry cache plugin
+        run: tutor plugins enable docker-registry-cache && tutor config save
+      - name: Build openedx Docker image with cache from edx-platform fork
+        run: time tutor images build --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/overhangio/edx-platform.git openedx
+
   build-openedx-with-build-cache:
     runs-on: ubuntu-latest
     steps:
