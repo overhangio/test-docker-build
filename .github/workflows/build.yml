@@ -14,6 +14,8 @@ jobs:
       - uses: overhangio/test-docker-build@main
       - name: Build openedx Docker image from scratch
         run: time tutor images build openedx
+      - name: Build openedx Docker image from edx-platform fork
+        run: time tutor images build --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/overhangio/edx-platform.git openedx
 
   build-openedx-with-registry-cache:
     runs-on: ubuntu-latest
@@ -21,9 +23,20 @@ jobs:
       - uses: overhangio/test-docker-build@main
       - name: Install tutor from fork
         run: pip uninstall --yes tutor && pip install git+https://github.com/overhangio/tutor.git@regisb/docker-optimize#egg=tutor
-      - name: Install registry cache plugin 
+      - name: Install registry cache plugin
         run: tutor plugins install https://gist.githubusercontent.com/regisb/4049622ec4b48cbd48c89ec708dc5252/raw/docker-registry-cache.py
       - name: Enable registry cache plugin
         run: tutor plugins enable docker-registry-cache && tutor config save
       - name: Build openedx Docker image with cache
         run: time tutor images build openedx
+
+  build-openedx-with-build-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: overhangio/test-docker-build@main
+      - name: Install tutor from regisb/build-mount branch https://github.com/overhangio/tutor/pull/829
+        run: pip uninstall --yes tutor && pip install git+https://github.com/overhangio/tutor.git@regisb/build-mount#egg=tutor
+      - name: Build openedx base image
+        run: time tutor images build openedx
+      - name: Build openedx Docker image from edx-platform fork
+        run: time tutor images build --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/overhangio/edx-platform.git openedx
